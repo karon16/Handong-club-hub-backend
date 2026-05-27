@@ -1,8 +1,8 @@
-# 🚀 Handong ClubHub Backend
+# Handong ClubHub Backend
 
 Welcome to the backend repository for the **Handong ClubHub** platform. This system is a robust, modular RESTful API designed to manage club registrations, users, and activities securely.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Runtime & Framework**: Node.js with Express.js
 - **Language**: TypeScript (Strict Mode)
@@ -10,7 +10,7 @@ Welcome to the backend repository for the **Handong ClubHub** platform. This sys
 - **API Documentation**: `swagger-autogen` and `swagger-ui-express`
 - **Formatting & Linting**: Prettier, Husky, and `lint-staged`
 
-## 📁 Architecture & Directory Structure
+## Architecture & Directory Structure
 
 We enforce a strict **Separation of Concerns**. Please do not write business logic directly in route definitions.
 
@@ -29,7 +29,7 @@ We enforce a strict **Separation of Concerns**. Please do not write business log
 └── tsconfig.json    # TypeScript compiler options
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -61,16 +61,38 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 - `npm start` - Runs the compiled application from `/dist/server.js` (for production).
 - `npm run swagger` - Generates the `swagger.json` file for API documentation based on your route comments.
 
-## 📖 API Documentation (Swagger)
+### 4. Verifying the Setup (Health Check)
+
+To ensure the server is running correctly after initialization, start the development server (`npm run dev`) and test the root health check endpoint.
+
+Using **curl** in a new terminal:
+
+```bash
+curl http://localhost:4000/
+```
+
+_(Note: Replace `4000` with your actual PORT if it differs)._
+
+You should receive a `200 OK` JSON response:
+
+```json
+{
+  "status": "server online"
+}
+```
+
+Alternatively, you can verify this by simply navigating to `http://localhost:4000/` in your web browser.
+
+## API Documentation (Swagger)
 
 All Express routes **must** include a correctly formatted `#swagger` comment block immediately inside the route handler. Run `npm run swagger` to regenerate the documentation whenever you modify or add routes. This ensures the frontend team always has an accurate API contract to work with.
 
 ### Accessing the Interactive UI
 
 Once the server is running (`npm run dev`), you can access the visual documentation by navigating to:
-👉 **[http://localhost:3000/api-docs](http://localhost:3000/api-docs)**
+**[http://localhost:[PORT]/api-docs](http://localhost:[PORT]/api-docs)**
 
-## ⚖️ Contribution Guidelines
+## Contribution Guidelines
 
 - **TypeScript Strictness**: Never use `any`. Always explicitly define types/interfaces for requests, queries, and database payloads in `src/types/`.
 - **Database & Auth**: Never write raw SQL queries; use the `@supabase/supabase-js` client. Use Supabase JWT validation in middlewares to protect routes.
