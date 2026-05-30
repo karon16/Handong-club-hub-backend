@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { checkHealth } from '../controllers/health.controller';
+import clubRoutes from './clubRoutes';
 
 const router = Router();
 
@@ -12,5 +13,8 @@ router.get('/', (req, res) => {
   */
   checkHealth(req, res);
 });
+
+// Mount modular routes
+router.use('/clubs', clubRoutes);
 
 export default router;
