@@ -14,13 +14,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve Swagger documentation for teammates to test the API
 const swaggerDocument = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../swagger.json'), 'utf8')
 );
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Load all API routes
+// All routes are aggregated in src/routes/index.ts
 app.use('/', routes);
 
 app.listen(PORT, () => {
