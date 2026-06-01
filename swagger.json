@@ -141,18 +141,78 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "example": "uuid"
+                    "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                   },
                   "name": {
                     "type": "string",
-                    "example": "Club Name"
+                    "example": "Handong Dance Club"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "A club for students passionate about dance."
+                  },
+                  "mission": {
+                    "type": "string",
+                    "example": "To cultivate creativity and teamwork through dance."
+                  },
+                  "history": {
+                    "type": "string",
+                    "example": "Founded in 2005 by a group of dance enthusiasts."
+                  },
+                  "core_values": {
+                    "type": "object",
+                    "example": ["Creativity", "Teamwork", "Excellence"]
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "example": "uuid"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "is_recruiting": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "meeting_schedule": {
+                    "type": "string",
+                    "example": "Every Tuesday and Thursday at 7pm"
+                  },
+                  "meeting_location": {
+                    "type": "string",
+                    "example": "Room 201, Handong Arts Building"
+                  },
+                  "membership_fee": {
+                    "type": "string",
+                    "example": "30000 KRW per semester"
+                  },
+                  "social_links": {
+                    "type": "object",
+                    "example": {"instagram": "https://instagram.com/hdance", "youtube": "https://youtube.com/@hdance"}
+                  },
+                  "cover_image_url": {
+                    "type": "string",
+                    "example": "https://example.com/cover.jpg"
+                  },
+                  "logo_url": {
+                    "type": "string",
+                    "example": "https://example.com/logo.png"
+                  },
+                  "exec_user_id": {
+                    "type": "string",
+                    "example": "uuid"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:30:00Z"
                   },
                   "categories": {
                     "type": "object",
                     "properties": {
                       "name": {
                         "type": "string",
-                        "example": "Academic"
+                        "example": "Arts & Culture"
                       }
                     }
                   }
