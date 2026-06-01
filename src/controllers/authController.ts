@@ -22,11 +22,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Validate role against allowed values (Ai_Rules: student | club_executive)
     const allowedRoles = ['student', 'club_executive'];
     const userRole = allowedRoles.includes(role) ? role : 'student';
-
-    // Step 1: Create user in Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -43,10 +40,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Step 2: Hash the password with bcrypt
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
-
-    // Step 3: Insert user record — public.users.id = Supabase auth UUID
     const { error: dbError } = await supabase.from('users').insert({
       id: authData.user.id,
       email,
@@ -91,6 +85,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ error: 'Missing required fields: email and password.' });
       return;
     }
+
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,

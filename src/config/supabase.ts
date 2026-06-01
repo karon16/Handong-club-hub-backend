@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
-// Support both naming conventions used across the team
 const supabaseKey = process.env.SUPABASE_KEY ?? process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl) {
