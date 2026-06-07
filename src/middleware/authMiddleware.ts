@@ -2,15 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { supabase } from '../config/supabase';
 import { User } from '@supabase/supabase-js';
 
-// Extend the Express Request interface globally to include the verified user object
-declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-    }
-  }
-}
-
 /**
  * Middleware to enforce authentication using Supabase JWT validation.
  * Extracts the Bearer token from the Authorization header and verifies it.
@@ -64,7 +55,7 @@ export const requireAuth = async (
     }
 
     // Attach user data to custom req.user property
-    req.user = user;
+    req.user = user as any;
 
     // Delegate to the next middleware or controller
     next();
