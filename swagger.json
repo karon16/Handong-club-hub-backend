@@ -7,7 +7,9 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "paths": {
     "/": {
       "get": {
@@ -29,6 +31,418 @@
             }
           }
         }
+      }
+    },
+    "/api/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a Supabase Auth account and a matching record in public.users. Role defaults to student.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@handong.ac.kr"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "secret"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Leo Ricardo"
+                },
+                "role": {
+                  "type": "string",
+                  "example": "student"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "400": {
+            "description": "Missing fields or Supabase auth error"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login and receive JWT",
+        "description": "Authenticates via Supabase Auth and returns access_token for use in Authorization: Bearer headers.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@handong.ac.kr"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "secret"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful, returns session tokens"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/clubs/": {
+      "get": {
+        "tags": [
+          "Clubs"
+        ],
+        "summary": "Get all clubs",
+        "description": "Retrieve all clubs with their associated category names. Public endpoint.",
+        "responses": {
+          "200": {
+            "description": "Successfully fetched all clubs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Handong Dance Club"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "A club for students passionate about dance."
+                  },
+                  "mission": {
+                    "type": "string",
+                    "example": "To cultivate creativity and teamwork through dance."
+                  },
+                  "history": {
+                    "type": "string",
+                    "example": "Founded in 2005 by a group of dance enthusiasts."
+                  },
+                  "core_values": {
+                    "type": "object",
+                    "example": ["Creativity", "Teamwork", "Excellence"]
+                  },
+                  "category_id": {
+                    "type": "string",
+                    "example": "uuid"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "is_recruiting": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "meeting_schedule": {
+                    "type": "string",
+                    "example": "Every Tuesday and Thursday at 7pm"
+                  },
+                  "meeting_location": {
+                    "type": "string",
+                    "example": "Room 201, Handong Arts Building"
+                  },
+                  "membership_fee": {
+                    "type": "string",
+                    "example": "30000 KRW per semester"
+                  },
+                  "social_links": {
+                    "type": "object",
+                    "example": {"instagram": "https://instagram.com/hdance", "youtube": "https://youtube.com/@hdance"}
+                  },
+                  "cover_image_url": {
+                    "type": "string",
+                    "example": "https://example.com/cover.jpg"
+                  },
+                  "logo_url": {
+                    "type": "string",
+                    "example": "https://example.com/logo.png"
+                  },
+                  "exec_user_id": {
+                    "type": "string",
+                    "example": "uuid"
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:30:00Z"
+                  },
+                  "categories": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "Arts & Culture"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/events/": {
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Create a new club event",
+        "description": "Club Executives only. Creates a new event for a specific club. The requesting user must be a registered executive of the given club_id.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "club_id": {
+                  "type": "string",
+                  "example": "uuid"
+                },
+                "title": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "event_date": {
+                  "type": "string",
+                  "example": "2026-09-01T18:00:00Z"
+                },
+                "poster_url": {
+                  "type": "string",
+                  "example": "https://example.com/poster.jpg"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Event created successfully"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden — not an executive of this club"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Get all upcoming events",
+        "description": "Public endpoint. Returns all non-archived, future events sorted by chronological proximity (soonest first).",
+        "responses": {
+          "200": {
+            "description": "Array of upcoming event objects"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/applications/": {
+      "post": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Submit a club application",
+        "description": "Students only. Submits a recruitment application for a club. The club must have is_recruiting set to true. Answers is a dynamic JSON object whose keys map to the club\\'s custom questions.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "club_id": {
+                  "type": "string",
+                  "example": "uuid"
+                },
+                "answers": {
+                  "type": "object",
+                  "properties": {
+                    "Why do you want to join?": {
+                      "type": "string",
+                      "example": "I love dancing"
+                    },
+                    "Experience?": {
+                      "type": "string",
+                      "example": "3 years"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Application submitted, status set to Pending"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Club is not recruiting or duplicate application"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/applications/{id}/status": {
+      "patch": {
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Update application status (Kanban)",
+        "description": "Club Executives only. Updates the status of a specific application — used for Kanban drag-and-drop. Valid statuses: Pending, Under Review, Interview Scheduled, Accepted, Rejected. Automatically inserts a notification for the applicant.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Application UUID"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "example": "Under Review"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status updated and notification sent to applicant"
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden — not an executive of this club"
+          },
+          "404": {
+            "description": "Application not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   }
