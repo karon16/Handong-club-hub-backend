@@ -24,6 +24,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     const allowedRoles = ['student', 'club_executive'];
     const userRole = allowedRoles.includes(role) ? role : 'student';
+
+    // 1. Create user in Supabase Auth securely
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -36,11 +38,16 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (!authData.user) {
-      res.status(400).json({ error: 'Signup failed: could not create user account.' });
+      res
+        .status(400)
+        .json({ error: 'Signup failed: could not create user account.' });
       return;
     }
 
+    // 2. Hash password to satisfy the public schema requirements
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+
+    // 3. Save profile data
     const { error: dbError } = await supabase.from('users').insert({
       id: authData.user.id,
       email,
@@ -50,8 +57,13 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (dbError) {
-      console.error('[signup] Failed to insert user into public table:', dbError.message);
-      res.status(500).json({ error: 'Account created but failed to save user profile.' });
+      console.error(
+        '[signup] Failed to insert user into public table:',
+        dbError.message
+      );
+      res
+        .status(500)
+        .json({ error: 'Account created but failed to save user profile.' });
       return;
     }
 
@@ -66,13 +78,15 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (err: unknown) {
     console.error('[signup] Unexpected error:', err);
-    res.status(500).json({ error: 'An unexpected server error occurred during signup.' });
+    res
+      .status(500)
+      .json({ error: 'An unexpected server error occurred during signup.' });
   }
 };
 
 /**
  * Authenticate a user with email and password via Supabase Auth
- * and return their JWT session token.
+ * and return their JWT session token and role.
  *
  * @route POST /api/auth/login
  * @access Public
@@ -82,36 +96,48 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ error: 'Missing required fields: email and password.' });
+      res.status(400).json({ error: 'Email and password are required.' });
+      return;
+    }
+    // 1. Supabase Auth handles the secure password verification
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+    if (authError || !authData.user) {
+      res.status(401).json({ error: 'Invalid login credentials.' });
       return;
     }
 
+    // 2. Fetch the user's role from the public profile table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', authData.user.id)
+      .single();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      console.warn('[login] Authentication failed:', error.message);
-      res.status(401).json({ error: 'Invalid email or password.' });
+    if (userError) {
+      console.error('[login] Profile fetch error:', userError);
+      res.status(500).json({ error: 'User profile not found.' });
       return;
     }
 
+    // 3. Return the exact payload the frontend needs
     res.status(200).json({
       message: 'Login successful.',
-      session: {
-        access_token: data.session?.access_token,
-        refresh_token: data.session?.refresh_token,
-        expires_at: data.session?.expires_at,
-      },
+      session: authData.session,
       user: {
-        id: data.user?.id,
-        email: data.user?.email,
+        id: authData.user.id,
+        email: authData.user.email,
+        role: userData.role,
       },
     });
   } catch (err: unknown) {
     console.error('[login] Unexpected error:', err);
-    res.status(500).json({ error: 'An unexpected server error occurred during login.' });
+    res
+      .status(500)
+      .json({ error: 'An unexpected server error occurred during login.' });
   }
 };
