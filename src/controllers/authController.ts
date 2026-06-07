@@ -22,6 +22,11 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if (!email.endsWith('@handong.ac.kr')) {
+      res.status(400).json({ error: 'Sign up is restricted to @handong.ac.kr email addresses.' });
+      return;
+    }
+
     const allowedRoles = ['student', 'club_executive'];
     const userRole = allowedRoles.includes(role) ? role : 'student';
 

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getAllClubs, getClubById, createClub, updateClub, deleteClub } from '../controllers/clubController';
+import { getClubApplications } from '../controllers/applicationController';
 import { authenticate } from '../middlewares/auth.middleware';
 import { requireRole } from '../middlewares/rbac.middleware';
 
@@ -88,6 +89,21 @@ router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => 
     #swagger.responses[404] = { description: 'Club not found' }
   */
   updateClub(req, res);
+});
+
+router.get('/:clubId/applications', authenticate, requireRole('club_executive'), (req, res) => {
+  /*
+    #swagger.tags = ['Clubs']
+    #swagger.summary = "Get all applications for a club"
+    #swagger.description = "Club Executives only. Returns all applications submitted to the caller's club, newest first, with applicant info joined."
+    #swagger.security = [{ "bearerAuth": [] }]
+    #swagger.parameters['clubId'] = { in: 'path', required: true, type: 'string', format: 'uuid' }
+    #swagger.responses[200] = { description: 'Array of application objects with nested user info' }
+    #swagger.responses[401] = { description: 'Unauthorized' }
+    #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
+    #swagger.responses[404] = { description: 'Club not found' }
+  */
+  getClubApplications(req, res);
 });
 
 router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) => {

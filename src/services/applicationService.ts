@@ -68,7 +68,7 @@ export async function createApplication(
 ): Promise<ServiceResult<CreatedApplication>> {
   const { data, error } = await supabase
     .from('applications')
-    .insert([{ user_id: userId, club_id: clubId, answers, status: 'pending' }])
+    .insert([{ user_id: userId, club_id: clubId, answers, status: 'Pending' }])
     .select()
     .single();
 
@@ -81,6 +81,26 @@ export async function createApplication(
   }
 
   return { success: true, data: data as CreatedApplication };
+}
+
+/**
+ * Returns all applications for a given club, newest first, with basic user info joined.
+ * Caller must verify exec ownership before calling this.
+ */
+export async function getApplicationsByClub(
+  clubId: string
+): Promise<ServiceResult<ApplicationWithClub[]>> {
+  const { data, error } = await supabase
+    .from('applications')
+    .select('*, users(id, name, email)')
+    .eq('club_id', clubId)
+    .order('submitted_at', { ascending: false });
+
+  if (error) {
+    return { success: false, reason: 'db_error', message: error.message };
+  }
+
+  return { success: true, data: (data ?? []) as ApplicationWithClub[] };
 }
 
 /**

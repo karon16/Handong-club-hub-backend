@@ -7,6 +7,7 @@ import eventsRouter from './events/route';
 import applicationsRouter from './applications/route';
 import categoriesRouter from './categoriesRoutes';
 import interactionsRouter from './interactions/route';
+import notificationsRouter from './notificationsRoutes';
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.use('/api/events', eventsRouter);
 router.use('/api/applications', applicationsRouter);
 router.use('/api/categories', categoriesRouter);
 router.use('/api/interactions', interactionsRouter);
+router.use('/api/notifications', notificationsRouter);
 
 export default router;
