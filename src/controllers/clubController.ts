@@ -116,9 +116,21 @@ export const getAllClubs = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { data, error } = await supabase
-      .from('clubs')
-      .select('*, categories(name)');
+    const { category_id, is_recruiting, search } = req.query;
+
+    let query = supabase.from('clubs').select('*, categories(name)');
+
+    if (category_id) {
+      query = query.eq('category_id', category_id as string);
+    }
+    if (is_recruiting !== undefined) {
+      query = query.eq('is_recruiting', is_recruiting === 'true');
+    }
+    if (search) {
+      query = query.ilike('name', `%${search as string}%`);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('[getAllClubs] Database query failed:', error);
