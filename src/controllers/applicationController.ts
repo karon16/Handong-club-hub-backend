@@ -16,15 +16,51 @@ import {
 } from '../utils/validation';
 import {
   createApplication,
+  getApplicationsByClub,
   getApplicationsByUser,
   findApplicationClub,
   verifyClubOwnership,
   setApplicationStatus,
 } from '../services/applicationService';
+import { supabase } from '../config/supabase';
 
 // ---------------------------------------------------------------------------
 // Handlers
 // ---------------------------------------------------------------------------
+
+/**
+ * Returns all applications submitted to a club the exec manages.
+ *
+ * @route  GET /api/clubs/:clubId/applications
+ * @access Authenticated (club_executive)
+ */
+export const getClubApplications = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized.' });
+    return;
+  }
+
+  const clubId = req.params.clubId as string;
+
+  const ownership = await verifyClubOwnership(clubId, req.user.id);
+  if (!ownership.success) {
+    const status = ownership.reason === 'not_found' ? 404 : 403;
+    res.status(status).json({ error: ownership.message });
+    return;
+  }
+
+  const result = await getApplicationsByClub(clubId);
+  if (!result.success) {
+    console.error('[getClubApplications] DB error:', result.message);
+    res.status(500).json({ error: 'Failed to retrieve applications.' });
+    return;
+  }
+
+  res.status(200).json(result.data);
+};
 
 /**
  * Returns all applications submitted by the authenticated student.
@@ -150,6 +186,18 @@ export const updateApplicationStatus = async (
     res.status(500).json({ error: 'Failed to update application.' });
     return;
   }
+
+  // step 4: notify the applicant (fire-and-forget — never block the response)
+  supabase
+    .from('notifications')
+    .insert({
+      user_id: updateResult.data.user_id,
+      type: 'status_update',
+      message: `Your application status has been updated to "${status}".`,
+    })
+    .then(({ error }) => {
+      if (error) console.error('[updateApplicationStatus] Notification insert failed:', error.message);
+    });
 
   res
     .status(200)

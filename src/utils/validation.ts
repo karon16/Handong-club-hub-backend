@@ -7,11 +7,15 @@
  * eliminating the need for paired boolean + string variables elsewhere.
  */
 
-/** Allowlist of valid application statuses. Kept here so it is the single source of truth. */
+/** Allowlist of valid application statuses. Kept here so it is the single source of truth.
+ *  Values match Ai_Rules.md: Pending, Under Review, Interview Scheduled, Accepted, Rejected.
+ */
 export const VALID_APPLICATION_STATUSES = new Set([
-  'pending',
-  'accepted',
-  'rejected',
+  'Pending',
+  'Under Review',
+  'Interview Scheduled',
+  'Accepted',
+  'Rejected',
 ]);
 
 /** Shape returned by all validation helpers in this module. */
