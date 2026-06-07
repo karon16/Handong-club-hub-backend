@@ -16,6 +16,7 @@ import {
 } from '../utils/validation';
 import {
   createApplication,
+  getApplicationsByUser,
   findApplicationClub,
   verifyClubOwnership,
   setApplicationStatus,
@@ -24,6 +25,31 @@ import {
 // ---------------------------------------------------------------------------
 // Handlers
 // ---------------------------------------------------------------------------
+
+/**
+ * Returns all applications submitted by the authenticated student.
+ *
+ * @route  GET /api/applications
+ * @access Authenticated (student)
+ */
+export const getMyApplications = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized.' });
+    return;
+  }
+
+  const result = await getApplicationsByUser(req.user.id);
+  if (!result.success) {
+    console.error('[getMyApplications] DB error:', result.message);
+    res.status(500).json({ error: 'Failed to retrieve applications.' });
+    return;
+  }
+
+  res.status(200).json(result.data);
+};
 
 /**
  * Handles a student submitting a new application to a club.
