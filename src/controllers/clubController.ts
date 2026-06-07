@@ -1,12 +1,29 @@
 import { Request, Response } from 'express';
+import { z } from 'zod';
 import { supabase } from '../config/supabase';
 
-/**
- * Fetch all clubs including their associated category's name.
- *
- * @route GET /api/clubs
- * @access Public
- */
+const updateClubSchema = z
+  .object({
+    name: z.string().min(1).max(200),
+    description: z.string(),
+    mission: z.string(),
+    history: z.string(),
+    core_values: z.unknown(),
+    category_id: z.string().uuid(),
+    is_active: z.boolean(),
+    is_recruiting: z.boolean(),
+    meeting_schedule: z.string(),
+    meeting_location: z.string(),
+    membership_fee: z.string(),
+    social_links: z.unknown(),
+    cover_image_url: z.string().url(),
+    logo_url: z.string().url(),
+  })
+  .partial()
+  .refine((obj) => Object.keys(obj).length > 0, {
+    message: 'Request body must contain at least one field to update.',
+  });
+
 export const getAllClubs = async (
   req: Request,
   res: Response
@@ -27,6 +44,81 @@ export const getAllClubs = async (
     res.status(200).json(data);
   } catch (err: unknown) {
     console.error('[getAllClubs] Unexpected handler error:', err);
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
+  }
+};
+
+export const getClubById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+      .from('clubs')
+      .select('*, categories(id, name, icon_name, gradient)')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      res.status(404).json({ error: 'Club not found.' });
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (err: unknown) {
+    console.error('[getClubById] Unexpected handler error:', err);
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
+  }
+};
+
+export const updateClub = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.id;
+
+    const { data: club, error: clubError } = await supabase
+      .from('clubs')
+      .select('exec_user_id')
+      .eq('id', id)
+      .single();
+
+    if (clubError || !club) {
+      res.status(404).json({ error: 'Club not found.' });
+      return;
+    }
+
+    if (club.exec_user_id !== userId) {
+      res.status(403).json({ error: 'You are not an executive of this club.' });
+      return;
+    }
+
+    const parsed = updateClubSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.flatten() });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('clubs')
+      .update(parsed.data)
+      .eq('id', id)
+      .select('*, categories(id, name, icon_name, gradient)')
+      .single();
+
+    if (error || !data) {
+      console.error('[updateClub] Database update failed:', error);
+      res.status(500).json({ error: 'Failed to update club.' });
+      return;
+    }
+
+    res.status(200).json(data);
+  } catch (err: unknown) {
+    console.error('[updateClub] Unexpected handler error:', err);
     res.status(500).json({ error: 'An unexpected server error occurred.' });
   }
 };

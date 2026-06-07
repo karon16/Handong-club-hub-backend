@@ -29,6 +29,17 @@ export interface UpdatedApplication extends CreatedApplication {
   updated_at: string;
 }
 
+/** Application row joined with minimal club info for student dashboard display. */
+export interface ApplicationWithClub extends CreatedApplication {
+  updated_at: string;
+  submitted_at: string;
+  clubs: {
+    id: string;
+    name: string;
+    logo_url: string | null;
+  } | null;
+}
+
 /** Generic discriminated-union result so callers can use early-return guards. */
 export type ServiceResult<T> =
   | { success: true; data: T }
@@ -70,6 +81,32 @@ export async function createApplication(
   }
 
   return { success: true, data: data as CreatedApplication };
+}
+
+/**
+ * Returns all applications submitted by a given user, newest first,
+ * with minimal club info joined for dashboard display.
+ *
+ * @param userId - The authenticated student's UUID.
+ */
+export async function getApplicationsByUser(
+  userId: string
+): Promise<ServiceResult<ApplicationWithClub[]>> {
+  const { data, error } = await supabase
+    .from('applications')
+    .select('*, clubs(id, name, logo_url)')
+    .eq('user_id', userId)
+    .order('submitted_at', { ascending: false });
+
+  if (error) {
+    return {
+      success: false,
+      reason: 'db_error',
+      message: error.message,
+    };
+  }
+
+  return { success: true, data: (data ?? []) as ApplicationWithClub[] };
 }
 
 /**
