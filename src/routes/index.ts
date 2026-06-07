@@ -5,6 +5,8 @@ import clubRoutes from './clubRoutes';
 import eventsRouter from './events/route';
 // Import the single, correct applications router
 import applicationsRouter from './applications/route';
+import categoriesRouter from './categoriesRoutes';
+import interactionsRouter from './interactions/route';
 
 const router = Router();
 
@@ -23,5 +25,7 @@ router.use('/api/clubs', clubRoutes);
 router.use('/api/events', eventsRouter);
 // This single line handles all ATS requests (POST /api/applications, PATCH /api/applications/:id)
 router.use('/api/applications', applicationsRouter);
+router.use('/api/categories', categoriesRouter);
+router.use('/api/interactions', interactionsRouter);
 
 export default router;
