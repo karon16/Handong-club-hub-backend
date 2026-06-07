@@ -12,7 +12,8 @@ export const createEvent = async (
     return;
   }
 
-  const { club_id, title, description, event_date, poster_image_url } = parsed.data;
+  const { club_id, title, description, event_date, poster_image_url } =
+    parsed.data;
   const userId = req.user!.id;
 
   // Verify the requesting user is the executive of this specific club via clubs.exec_user_id
@@ -41,17 +42,16 @@ export const createEvent = async (
     .single();
 
   if (error) {
-    res.status(500).json({ error: 'Failed to create event', details: error.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to create event', details: error.message });
     return;
   }
 
   res.status(201).json(data);
 };
 
-export const getEvents = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getEvents = async (req: Request, res: Response): Promise<void> => {
   const now = new Date().toISOString();
 
   // Return only future, non-archived events sorted by soonest first (UR-04, FR3.2, FR3.3)
@@ -63,7 +63,29 @@ export const getEvents = async (
     .order('event_date', { ascending: true });
 
   if (error) {
-    res.status(500).json({ error: 'Failed to fetch events', details: error.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to fetch events', details: error.message });
+    return;
+  }
+
+  res.status(200).json(data);
+};
+
+export const getEventById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    res.status(404).json({ error: 'Event not found' });
     return;
   }
 
@@ -108,7 +130,9 @@ export const updateEvent = async (
     .single();
 
   if (error) {
-    res.status(500).json({ error: 'Failed to update event', details: error.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to update event', details: error.message });
     return;
   }
 
@@ -142,7 +166,9 @@ export const deleteEvent = async (
   const { error } = await supabase.from('events').delete().eq('id', id);
 
   if (error) {
-    res.status(500).json({ error: 'Failed to delete event', details: error.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to delete event', details: error.message });
     return;
   }
 

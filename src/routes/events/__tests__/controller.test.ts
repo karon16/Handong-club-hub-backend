@@ -66,6 +66,37 @@ describe('Events Controller', () => {
     });
   });
 
+  describe('getEventById', () => {
+    it('should fetch event by id successfully', async () => {
+      const req = mockRequest({ params: { id: 'event1' } });
+      const res = mockResponse();
+
+      mockQueryBuilder.single.mockResolvedValue({
+        data: { id: 'event1', title: 'Event 1' },
+        error: null,
+      });
+
+      await require('../controller').getEventById(req as any, res as any);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ id: 'event1', title: 'Event 1' });
+    });
+
+    it('should return 404 if event not found', async () => {
+      const req = mockRequest({ params: { id: 'event1' } });
+      const res = mockResponse();
+
+      mockQueryBuilder.single.mockResolvedValue({
+        data: null,
+        error: { message: 'not found' },
+      });
+
+      await require('../controller').getEventById(req as any, res as any);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+    });
+  });
+
   describe('createEvent', () => {
     it('should return 400 for invalid data', async () => {
       const req = mockRequest({
