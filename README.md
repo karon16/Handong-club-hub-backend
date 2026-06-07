@@ -20,18 +20,12 @@ We enforce a strict **Separation of Concerns**. Please do not write business log
 │   ├── config/      # Application configurations (e.g., Supabase client setup)
 │   ├── controllers/ # Business logic and database interactions
 │   ├── middlewares/ # Express middlewares (Authentication, Validation)
-│   ├── models/      # Database models and schema definitions
 │   ├── routes/      # API route definitions
-│   ├── services/    # Business logic and database interactions
 │   ├── types/       # Global TypeScript interfaces and types
-│   └── utils/       # Utility functions
 │   └── server.ts    # Express application entry point
 ├── .env             # Environment variables (Do not commit)
-├── .gitignore       # Git ignore rules for node_modules, build outputs, etc.
 ├── .prettierrc      # Prettier formatting rules
 ├── package.json     # Project metadata and dependencies
-├── swagger.js       # Swagger auto-generation script
-├── swagger.json     # Auto-generated Swagger documentation
 └── tsconfig.json    # TypeScript compiler options
 ```
 
