@@ -276,9 +276,10 @@ export const registerClubManager = async (
     };
 
     // Only attach the URL if the column is expected to exist.
-    if (advisorApprovalUrl) {
-      clubInsertData.advisor_approval_url = advisorApprovalUrl;
-    }
+    // NOTE: Column does not exist in DB yet, so we skip adding it to prevent crash
+    // if (advisorApprovalUrl) {
+    //   clubInsertData.advisor_approval_url = advisorApprovalUrl;
+    // }
 
     const { data: clubData, error: clubError } = await supabase
       .from('clubs')
@@ -291,12 +292,10 @@ export const registerClubManager = async (
         '[registerClubManager] Database insert failed for club:',
         clubError
       );
-      res
-        .status(500)
-        .json({
-          error:
-            'Failed to create club. Please check if the advisor_approval_url column exists.',
-        });
+      res.status(500).json({
+        error:
+          'Failed to create club. Please check if the advisor_approval_url column exists.',
+      });
       return;
     }
 
@@ -317,12 +316,10 @@ export const registerClubManager = async (
       return;
     }
 
-    res
-      .status(201)
-      .json({
-        club: clubData,
-        message: 'Successfully registered as club executive.',
-      });
+    res.status(201).json({
+      club: clubData,
+      message: 'Successfully registered as club executive.',
+    });
   } catch (err: unknown) {
     console.error('[registerClubManager] Unexpected handler error:', err);
     res.status(500).json({ error: 'An unexpected server error occurred.' });
