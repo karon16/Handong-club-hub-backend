@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase } from '../../config/supabase';
 
 // Get all news for a specific club
 export const getClubNews = async (
@@ -32,8 +32,6 @@ export const getClubNews = async (
         })
         .toUpperCase(),
       title: post.title,
-      type: post.type || 'write',
-      url: post.url,
       content: post.content,
       summary: post.excerpt,
     }));
@@ -52,7 +50,7 @@ export const createClubNews = async (
 ): Promise<void> => {
   try {
     const { clubId } = req.params;
-    const { title, date, type, url, content, summary } = req.body;
+    const { title, date, content, summary } = req.body;
     const userId = req.user?.id;
 
     if (!title || !date) {
@@ -86,8 +84,6 @@ export const createClubNews = async (
         author_user_id: userId,
         title,
         published_at: parsedDate.toISOString(),
-        type: type || 'write',
-        url: url || null,
         content: content || '',
         excerpt: summary || '',
       })
@@ -110,8 +106,6 @@ export const createClubNews = async (
         })
         .toUpperCase(),
       title: data.title,
-      type: data.type || 'write',
-      url: data.url,
       content: data.content,
       summary: data.excerpt,
     };
@@ -130,7 +124,7 @@ export const updateClubNews = async (
 ): Promise<void> => {
   try {
     const { clubId, newsId } = req.params;
-    const { title, date, type, url, content, summary } = req.body;
+    const { title, date, content, summary } = req.body;
     const userId = req.user?.id;
 
     // Verify user is executive of this club
@@ -158,8 +152,6 @@ export const updateClubNews = async (
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;
     if (parsedDate) updateData.published_at = parsedDate.toISOString();
-    if (type !== undefined) updateData.type = type;
-    if (url !== undefined) updateData.url = url;
     if (content !== undefined) updateData.content = content;
     if (summary !== undefined) updateData.excerpt = summary;
 
@@ -192,8 +184,6 @@ export const updateClubNews = async (
         })
         .toUpperCase(),
       title: data.title,
-      type: data.type || 'write',
-      url: data.url,
       content: data.content,
       summary: data.excerpt,
     };
