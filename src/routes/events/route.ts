@@ -41,6 +41,7 @@ router.get('/', (req, res) => {
     #swagger.tags = ['Events']
     #swagger.summary = 'Get all upcoming events'
     #swagger.description = 'Public endpoint. Returns all non-archived, future events sorted by chronological proximity (soonest first).'
+    #swagger.parameters['club_id'] = { in: 'query', description: 'Filter by club UUID', type: 'string', required: false }
     #swagger.responses[200] = { description: 'Array of upcoming event objects' }
   */
   getEvents(req, res);

@@ -53,14 +53,21 @@ export const createEvent = async (
 
 export const getEvents = async (req: Request, res: Response): Promise<void> => {
   const now = new Date().toISOString();
+  const { club_id } = req.query;
 
   // Return only future, non-archived events sorted by soonest first (UR-04, FR3.2, FR3.3)
-  const { data, error } = await supabase
+  let query = supabase
     .from('events')
     .select('*')
     .eq('is_archived', false)
     .gte('event_date', now)
     .order('event_date', { ascending: true });
+
+  if (club_id) {
+    query = query.eq('club_id', club_id);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     res
