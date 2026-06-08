@@ -7,6 +7,7 @@ import path from 'path';
 import routes from './routes';
 import clubRoutes from './routes/clubRoutes'; // by sailesh routing to the server
 import authRoutes from './routes/authRoutes'; // by sailesh routing to the server
+import uploadRoutes from './routes/uploadRoutes';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/clubs', clubRoutes); // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/upload', uploadRoutes);
 
 const swaggerDocument = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, '../swagger.json'), 'utf8')
