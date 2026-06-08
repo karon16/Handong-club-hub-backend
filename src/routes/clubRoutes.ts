@@ -5,15 +5,26 @@ import {
   createClub,
   updateClub,
   deleteClub,
+  registerClubManager,
 } from '../controllers/clubController';
 import { getClubApplications } from '../controllers/applicationController';
 import { authenticate } from '../middlewares/auth.middleware';
 import { requireRole } from '../middlewares/rbac.middleware';
+import { upload } from '../middlewares/upload.middleware';
 import newsRouter from './news/route';
 
 const router = Router();
 
 router.use('/:clubId/news', newsRouter);
+
+router.post(
+  '/register',
+  authenticate,
+  upload.single('clubDocument'),
+  (req, res) => {
+    registerClubManager(req, res);
+  }
+);
 
 router.get('/', (req, res) => {
   /*
