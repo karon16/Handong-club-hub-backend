@@ -10,6 +10,6 @@ const router = Router();
 // 2. The `upload.single('image')` middleware intercepts it, checks the 5MB limit, and puts the file in memory.
 //    (Note: 'image' is the exact field name Elise must use on the frontend form).
 // 3. If the middleware passes, it hands the request off to your `uploadImage` controller!
-router.post('/', upload.single('image'), uploadImage);
+router.post('/', upload.single('file'), uploadImage);
 
 export default router;
