@@ -1,10 +1,19 @@
 import { Router } from 'express';
-import { getAllClubs, getClubById, createClub, updateClub, deleteClub } from '../controllers/clubController';
+import multer from 'multer';
+import {
+  getAllClubs,
+  getClubById,
+  createClub,
+  updateClub,
+  deleteClub,
+  registerClubManager,
+} from '../controllers/clubController';
 import { getClubApplications } from '../controllers/applicationController';
 import { authenticate } from '../middlewares/auth.middleware';
 import { requireRole } from '../middlewares/rbac.middleware';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/', (req, res) => {
   /*
@@ -18,6 +27,36 @@ router.get('/', (req, res) => {
   */
   getAllClubs(req, res);
 });
+
+router.post(
+  '/register',
+  authenticate,
+  upload.single('clubDocument'),
+  (req, res) => {
+    /*
+    #swagger.tags = ['Clubs']
+    #swagger.summary = 'Register as a club manager'
+    #swagger.description = 'Allows a student to create a club and instantly become a club executive.'
+    #swagger.security = [{ "bearerAuth": [] }]
+    #swagger.parameters['body'] = {
+      in: 'body',
+      required: true,
+      schema: {
+        clubName: 'Debate Society',
+        clubCategory: 'uuid',
+        clubDescription: 'Mission statement...',
+        firstName: 'John',
+        lastName: 'Doe'
+      }
+    }
+    #swagger.responses[201] = { description: 'Successfully registered as club executive' }
+    #swagger.responses[400] = { description: 'Invalid request body' }
+    #swagger.responses[401] = { description: 'Unauthorized' }
+    #swagger.responses[500] = { description: 'Internal server error' }
+  */
+    registerClubManager(req, res);
+  }
+);
 
 router.post('/', authenticate, requireRole('club_executive'), (req, res) => {
   /*
@@ -59,8 +98,12 @@ router.get('/:id', (req, res) => {
   getClubById(req, res);
 });
 
-router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => {
-  /*
+router.patch(
+  '/:id',
+  authenticate,
+  requireRole('club_executive'),
+  (req, res) => {
+    /*
     #swagger.tags = ['Clubs']
     #swagger.summary = 'Update club profile'
     #swagger.description = 'Club Executives only. Partially updates the profile of a club the caller manages. All body fields are optional — only provided fields are changed.'
@@ -88,11 +131,16 @@ router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => 
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-  updateClub(req, res);
-});
+    updateClub(req, res);
+  }
+);
 
-router.get('/:clubId/applications', authenticate, requireRole('club_executive'), (req, res) => {
-  /*
+router.get(
+  '/:clubId/applications',
+  authenticate,
+  requireRole('club_executive'),
+  (req, res) => {
+    /*
     #swagger.tags = ['Clubs']
     #swagger.summary = "Get all applications for a club"
     #swagger.description = "Club Executives only. Returns all applications submitted to the caller's club, newest first, with applicant info joined."
@@ -103,11 +151,16 @@ router.get('/:clubId/applications', authenticate, requireRole('club_executive'),
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-  getClubApplications(req, res);
-});
+    getClubApplications(req, res);
+  }
+);
 
-router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) => {
-  /*
+router.delete(
+  '/:id',
+  authenticate,
+  requireRole('club_executive'),
+  (req, res) => {
+    /*
     #swagger.tags = ['Clubs']
     #swagger.summary = 'Delete a club'
     #swagger.description = 'Club Executives only. Permanently deletes a club the caller manages.'
@@ -118,7 +171,8 @@ router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) =>
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-  deleteClub(req, res);
-});
+    deleteClub(req, res);
+  }
+);
 
 export default router;

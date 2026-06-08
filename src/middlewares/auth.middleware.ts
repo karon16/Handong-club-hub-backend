@@ -9,6 +9,10 @@ export const authenticate = async (
 ): Promise<void> => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
+    console.error(
+      '[Auth Middleware] 401: Missing or invalid Authorization header. Header:',
+      authHeader
+    );
     res.status(401).json({ error: 'Missing or invalid Authorization header' });
     return;
   }
@@ -23,6 +27,10 @@ export const authenticate = async (
     } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
+      console.error(
+        '[Auth Middleware] 401: Invalid or expired token. Error:',
+        authError
+      );
       res.status(401).json({ error: 'Invalid or expired token' });
       return;
     }
@@ -35,6 +43,10 @@ export const authenticate = async (
       .single();
 
     if (dbError || !dbUser) {
+      console.error(
+        '[Auth Middleware] 401: User record not found. Error:',
+        dbError
+      );
       res.status(401).json({ error: 'User record not found in public table' });
       return;
     }
