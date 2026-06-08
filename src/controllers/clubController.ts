@@ -56,7 +56,7 @@ export const createClub = async (
     const { data, error } = await supabase
       .from('clubs')
       .insert({ ...parsed.data, exec_user_id: userId })
-      .select('*, categories(id, name, icon_name, gradient)')
+      .select('*, categories!fk_clubs_category(id, name, icon_name, gradient)')
       .single();
 
     if (error || !data) {
@@ -118,7 +118,9 @@ export const getAllClubs = async (
   try {
     const { category_id, is_recruiting, search } = req.query;
 
-    let query = supabase.from('clubs').select('*, categories(name)');
+    let query = supabase
+      .from('clubs')
+      .select('*, categories!fk_clubs_category(name)');
 
     if (category_id) {
       query = query.eq('category_id', category_id as string);
@@ -156,7 +158,7 @@ export const getClubById = async (
 
     const { data, error } = await supabase
       .from('clubs')
-      .select('*, categories(id, name, icon_name, gradient)')
+      .select('*, categories!fk_clubs_category(id, name, icon_name, gradient)')
       .eq('id', id)
       .single();
 
@@ -206,7 +208,7 @@ export const updateClub = async (
       .from('clubs')
       .update(parsed.data)
       .eq('id', id)
-      .select('*, categories(id, name, icon_name, gradient)')
+      .select('*, categories!fk_clubs_category(id, name, icon_name, gradient)')
       .single();
 
     if (error || !data) {
@@ -284,7 +286,7 @@ export const registerClubManager = async (
     const { data: clubData, error: clubError } = await supabase
       .from('clubs')
       .insert(clubInsertData)
-      .select('*, categories(id, name, icon_name, gradient)')
+      .select('*, categories!fk_clubs_category(id, name, icon_name, gradient)')
       .single();
 
     if (clubError || !clubData) {
