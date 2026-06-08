@@ -8,7 +8,6 @@ import applicationsRouter from './applications/route';
 import categoriesRouter from './categoriesRoutes';
 import interactionsRouter from './interactions/route';
 import notificationsRouter from './notificationsRoutes';
-import galleryRoutes from './galleryRoutes';
 
 const router = Router();
 
@@ -30,6 +29,5 @@ router.use('/api/applications', applicationsRouter);
 router.use('/api/categories', categoriesRouter);
 router.use('/api/interactions', interactionsRouter);
 router.use('/api/notifications', notificationsRouter);
-router.use('/api/gallery', galleryRoutes);
 
 export default router;

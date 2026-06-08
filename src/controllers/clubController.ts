@@ -219,6 +219,7 @@ export const updateClub = async (
 
     res.status(200).json(data);
   } catch (err: unknown) {
+    console.error('[updateClub] Unexpected handler error:', err);
     res.status(500).json({ error: 'An unexpected server error occurred.' });
   }
 };
