@@ -1,6 +1,39 @@
 import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 
+export const getGalleryByClubId = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { clubId } = req.params;
+
+    const { data, error } = await supabase
+      .from('club_gallery_images')
+      .select('*')
+      .eq('club_id', clubId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      res.status(500).json({ error: 'Failed to fetch gallery.' });
+      return;
+    }
+
+    const items = (data || []).map((item) => ({
+      id: item.id,
+      type: (item.caption?.startsWith('video:') ? 'video' : 'photo') as
+        | 'photo'
+        | 'video',
+      url: item.image_url,
+    }));
+
+    res.status(200).json(items);
+  } catch (err) {
+    console.error('[getGalleryByClubId] Unexpected error:', err);
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
+  }
+};
+
 export const getGallery = async (
   req: Request,
   res: Response
