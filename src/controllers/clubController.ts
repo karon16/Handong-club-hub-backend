@@ -217,7 +217,114 @@ export const updateClub = async (
 
     res.status(200).json(data);
   } catch (err: unknown) {
-    console.error('[updateClub] Unexpected handler error:', err);
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
+  }
+};
+
+export const registerClubManager = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    // We expect clubName, clubCategory (as category_id), and clubDescription
+    const { clubName, clubCategory, clubDescription, firstName, lastName } =
+      req.body;
+
+    if (!clubName || !clubCategory) {
+      res.status(400).json({ error: 'Club name and category are required.' });
+      return;
+    }
+
+    let advisorApprovalUrl = null;
+
+    // Handle file upload if present
+    if (req.file) {
+      const fileExt = req.file.originalname.split('.').pop();
+      const fileName = `${userId}_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('club-documents')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error(
+          '[registerClubManager] Storage upload failed:',
+          uploadError
+        );
+        res.status(500).json({ error: 'Failed to upload document.' });
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('club-documents')
+        .getPublicUrl(filePath);
+
+      advisorApprovalUrl = publicUrlData.publicUrl;
+    }
+
+    // 1. Insert the new club into the clubs table
+    const clubInsertData: any = {
+      name: clubName,
+      category_id: clubCategory,
+      description: clubDescription || null,
+      exec_user_id: userId,
+    };
+
+    // Only attach the URL if the column is expected to exist.
+    if (advisorApprovalUrl) {
+      clubInsertData.advisor_approval_url = advisorApprovalUrl;
+    }
+
+    const { data: clubData, error: clubError } = await supabase
+      .from('clubs')
+      .insert(clubInsertData)
+      .select('*, categories(id, name, icon_name, gradient)')
+      .single();
+
+    if (clubError || !clubData) {
+      console.error(
+        '[registerClubManager] Database insert failed for club:',
+        clubError
+      );
+      res
+        .status(500)
+        .json({
+          error:
+            'Failed to create club. Please check if the advisor_approval_url column exists.',
+        });
+      return;
+    }
+
+    // 2. Update the user role in the public.users table to 'club_executive'
+    const { error: userError } = await supabase
+      .from('users')
+      .update({ role: 'club_executive' })
+      .eq('id', userId);
+
+    if (userError) {
+      console.error(
+        '[registerClubManager] Failed to update user role:',
+        userError
+      );
+      res
+        .status(500)
+        .json({ error: 'Club created but failed to update user role.' });
+      return;
+    }
+
+    res
+      .status(201)
+      .json({
+        club: clubData,
+        message: 'Successfully registered as club executive.',
+      });
+  } catch (err: unknown) {
+    console.error('[registerClubManager] Unexpected handler error:', err);
     res.status(500).json({ error: 'An unexpected server error occurred.' });
   }
 };

@@ -1,7 +1,13 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/auth.middleware';
 import { requireRole } from '../../middlewares/rbac.middleware';
-import { createEvent, getEvents, updateEvent, deleteEvent } from './controller';
+import {
+  createEvent,
+  getEvents,
+  getEventById,
+  updateEvent,
+  deleteEvent,
+} from './controller';
 
 const router = Router();
 
@@ -35,13 +41,30 @@ router.get('/', (req, res) => {
     #swagger.tags = ['Events']
     #swagger.summary = 'Get all upcoming events'
     #swagger.description = 'Public endpoint. Returns all non-archived, future events sorted by chronological proximity (soonest first).'
+    #swagger.parameters['club_id'] = { in: 'query', description: 'Filter by club UUID', type: 'string', required: false }
     #swagger.responses[200] = { description: 'Array of upcoming event objects' }
   */
   getEvents(req, res);
 });
 
-router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => {
+router.get('/:id', (req, res) => {
   /*
+    #swagger.tags = ['Events']
+    #swagger.summary = 'Get an event by ID'
+    #swagger.description = 'Public endpoint. Returns a single event by its UUID.'
+    #swagger.parameters['id'] = { in: 'path', required: true, type: 'string', format: 'uuid' }
+    #swagger.responses[200] = { description: 'Event object' }
+    #swagger.responses[404] = { description: 'Event not found' }
+  */
+  getEventById(req, res);
+});
+
+router.patch(
+  '/:id',
+  authenticate,
+  requireRole('club_executive'),
+  (req, res) => {
+    /*
     #swagger.tags = ['Events']
     #swagger.summary = 'Update an event'
     #swagger.description = 'Club Executives only. Partially updates an event belonging to a club the caller manages. All fields are optional.'
@@ -65,11 +88,16 @@ router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => 
     #swagger.responses[403] = { description: 'Forbidden — not an executive of this club' }
     #swagger.responses[404] = { description: 'Event not found' }
   */
-  updateEvent(req, res);
-});
+    updateEvent(req, res);
+  }
+);
 
-router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) => {
-  /*
+router.delete(
+  '/:id',
+  authenticate,
+  requireRole('club_executive'),
+  (req, res) => {
+    /*
     #swagger.tags = ['Events']
     #swagger.summary = 'Delete an event'
     #swagger.description = 'Club Executives only. Permanently deletes an event belonging to a club the caller manages.'
@@ -80,7 +108,8 @@ router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) =>
     #swagger.responses[403] = { description: 'Forbidden — not an executive of this club' }
     #swagger.responses[404] = { description: 'Event not found' }
   */
-  deleteEvent(req, res);
-});
+    deleteEvent(req, res);
+  }
+);
 
 export default router;
