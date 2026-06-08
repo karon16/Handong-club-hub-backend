@@ -23,7 +23,11 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (!email.endsWith('@handong.ac.kr')) {
-      res.status(400).json({ error: 'Sign up is restricted to @handong.ac.kr email addresses.' });
+      res
+        .status(400)
+        .json({
+          error: 'Sign up is restricted to @handong.ac.kr email addresses.',
+        });
       return;
     }
 
@@ -74,6 +78,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({
       message: 'User registered successfully.',
+      session: authData.session,
       user: {
         id: authData.user.id,
         email: authData.user.email,
