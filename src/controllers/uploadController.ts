@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 
+const ALLOWED_BUCKETS = ['club_gallery', 'club_banner', 'club-documents'];
+
 export const uploadImage = async (
   req: Request,
   res: Response
@@ -11,13 +13,19 @@ export const uploadImage = async (
       return;
     }
 
+    const requestedBucket = req.query.bucket as string | undefined;
+    const bucket =
+      requestedBucket && ALLOWED_BUCKETS.includes(requestedBucket)
+        ? requestedBucket
+        : 'club_gallery';
+
     const isVideo = req.file.mimetype.startsWith('video/');
     const timestamp = Date.now();
     const cleanFileName = req.file.originalname.replace(/[^a-zA-Z0-9.]/g, '');
     const uniqueFileName = `${timestamp}-${cleanFileName}`;
 
     const { data, error } = await supabase.storage
-      .from('club_gallery')
+      .from(bucket)
       .upload(uniqueFileName, req.file.buffer, {
         contentType: req.file.mimetype,
         upsert: false,
@@ -30,7 +38,7 @@ export const uploadImage = async (
     }
 
     const { data: publicUrlData } = supabase.storage
-      .from('club_gallery')
+      .from(bucket)
       .getPublicUrl(data.path);
 
     res.status(200).json({
