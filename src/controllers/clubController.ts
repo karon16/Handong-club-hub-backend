@@ -22,18 +22,18 @@ const updateClubSchema = z
   .object({
     name: z.string().min(1).max(200),
     description: z.string(),
-    mission: z.string(),
-    history: z.string(),
-    core_values: z.unknown(),
-    category_id: z.string().uuid(),
+    mission: z.string().nullable(),
+    history: z.string().nullable(),
+    core_values: z.unknown().nullable(),
+    category_id: z.string().uuid().nullable(),
     is_active: z.boolean(),
     is_recruiting: z.boolean(),
-    meeting_schedule: z.string(),
-    meeting_location: z.string(),
-    membership_fee: z.string(),
-    social_links: z.unknown(),
-    cover_image_url: z.string().url(),
-    logo_url: z.string().url(),
+    meeting_schedule: z.string().nullable(),
+    meeting_location: z.string().nullable(),
+    membership_fee: z.string().nullable(),
+    social_links: z.unknown().nullable(),
+    cover_image_url: z.string().url().nullable(),
+    logo_url: z.string().url().nullable(),
   })
   .partial()
   .refine((obj) => Object.keys(obj).length > 0, {
