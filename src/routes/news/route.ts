@@ -11,18 +11,8 @@ import { requireRole } from '../../middlewares/rbac.middleware';
 const router = Router({ mergeParams: true });
 
 router.get('/', getClubNews);
-router.post('/', authenticate, requireRole('club_executive'), createClubNews);
-router.patch(
-  '/:newsId',
-  authenticate,
-  requireRole('club_executive'),
-  updateClubNews
-);
-router.delete(
-  '/:newsId',
-  authenticate,
-  requireRole('club_executive'),
-  deleteClubNews
-);
+router.post('/', authenticate, createClubNews);
+router.patch('/:newsId', authenticate, updateClubNews);
+router.delete('/:newsId', authenticate, deleteClubNews);
 
 export default router;

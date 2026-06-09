@@ -79,12 +79,8 @@ router.get('/:id', (req, res) => {
   getClubById(req, res);
 });
 
-router.patch(
-  '/:id',
-  authenticate,
-  requireRole('club_executive'),
-  (req, res) => {
-    /*
+router.patch('/:id', authenticate, (req, res) => {
+  /*
     #swagger.tags = ['Clubs']
     #swagger.summary = 'Update club profile'
     #swagger.description = 'Club Executives only. Partially updates the profile of a club the caller manages. All body fields are optional — only provided fields are changed.'
@@ -112,16 +108,11 @@ router.patch(
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-    updateClub(req, res);
-  }
-);
+  updateClub(req, res);
+});
 
-router.get(
-  '/:clubId/applications',
-  authenticate,
-  requireRole('club_executive'),
-  (req, res) => {
-    /*
+router.get('/:clubId/applications', authenticate, (req, res) => {
+  /*
     #swagger.tags = ['Clubs']
     #swagger.summary = "Get all applications for a club"
     #swagger.description = "Club Executives only. Returns all applications submitted to the caller's club, newest first, with applicant info joined."
@@ -132,16 +123,11 @@ router.get(
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-    getClubApplications(req, res);
-  }
-);
+  getClubApplications(req, res);
+});
 
-router.delete(
-  '/:id',
-  authenticate,
-  requireRole('club_executive'),
-  (req, res) => {
-    /*
+router.delete('/:id', authenticate, (req, res) => {
+  /*
     #swagger.tags = ['Clubs']
     #swagger.summary = 'Delete a club'
     #swagger.description = 'Club Executives only. Permanently deletes a club the caller manages.'
@@ -152,8 +138,7 @@ router.delete(
     #swagger.responses[403] = { description: 'Forbidden — not the executive of this club' }
     #swagger.responses[404] = { description: 'Club not found' }
   */
-    deleteClub(req, res);
-  }
-);
+  deleteClub(req, res);
+});
 
 export default router;

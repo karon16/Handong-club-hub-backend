@@ -5,7 +5,7 @@ import { createEvent, getEvents, updateEvent, deleteEvent } from './controller';
 
 const router = Router();
 
-router.post('/', authenticate, requireRole('club_executive'), (req, res) => {
+router.post('/', authenticate, (req, res) => {
   /*
     #swagger.tags = ['Events']
     #swagger.summary = 'Create a new club event'
@@ -40,7 +40,7 @@ router.get('/', (req, res) => {
   getEvents(req, res);
 });
 
-router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => {
+router.patch('/:id', authenticate, (req, res) => {
   /*
     #swagger.tags = ['Events']
     #swagger.summary = 'Update an event'
@@ -68,7 +68,7 @@ router.patch('/:id', authenticate, requireRole('club_executive'), (req, res) => 
   updateEvent(req, res);
 });
 
-router.delete('/:id', authenticate, requireRole('club_executive'), (req, res) => {
+router.delete('/:id', authenticate, (req, res) => {
   /*
     #swagger.tags = ['Events']
     #swagger.summary = 'Delete an event'
